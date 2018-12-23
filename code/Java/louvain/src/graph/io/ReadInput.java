@@ -11,167 +11,132 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ReadInput {
+    private BufferedReader bufferedReader;
+    private double lineWeight;
+    private int node1, node2;
+    private String[] splitLine;
+    private String lineText;
+
     private int nNodes, nEdges;
     private Louvain G;
+    private HashMap<String, Integer> st;
 
-
-    public Louvain readFile(String filename, String sp, int start) throws IOException {
-        BufferedReader bufferedReader;
-        double lineWeight;
-        int node1, node2;
-        String[] splitLine;
-        String lineText;
-        AdjList adjList;
-
-        bufferedReader = new BufferedReader(new FileReader(filename));
+    private void initGraph(String filename, String sp, int start) throws IOException {
+        this.bufferedReader = new BufferedReader(new FileReader(filename));
         this.nEdges = this.nNodes = 0;
 
-        while ((lineText = bufferedReader.readLine()) != null) {
-            splitLine = lineText.split(sp);
-            node1 = Integer.parseInt(splitLine[0]);
-            if (node1 > this.nNodes)
-                this.nNodes = node1;
-            node2 = Integer.parseInt(splitLine[1]);
-            if (node2 > this.nNodes)
-                this.nNodes = node2;
-            if (node1 != node2)
+        while ((this.lineText = this.bufferedReader.readLine()) != null) {
+            this.splitLine = this.lineText.split(sp);
+            this.node1 = Integer.parseInt(this.splitLine[0]);
+            if (this.node1 > this.nNodes)
+                this.nNodes = this.node1;
+            this.node2 = Integer.parseInt(this.splitLine[1]);
+            if (this.node2 > this.nNodes)
+                this.nNodes = this.node2;
+            if (this.node1 != this.node2)
                 this.nEdges++;
         }
         this.nNodes += (start == 0) ? 1 : 0;
-        bufferedReader.close();
+        this.bufferedReader.close();
 
         this.G = new Louvain(this.nNodes, this.nEdges);
-        adjList = new AdjList(G);
+    }
 
-        bufferedReader = new BufferedReader(new FileReader(filename));
-        while ((lineText = bufferedReader.readLine()) != null) {
-            splitLine = lineText.split(sp);
+    public Louvain readFile(String filename, String sp, int start) throws IOException {
+        AdjList adjList;
 
-            node1 = Integer.parseInt(splitLine[0]) - start;
-            node2 = Integer.parseInt(splitLine[1]) - start;
-            if (node1 != node2) {
-                lineWeight = (splitLine.length > 2) ? Double.parseDouble(splitLine[2]) : 1;
+        initGraph(filename, sp, start);
 
-                adjList.CreateGraph(node1, node2, lineWeight);
+        adjList = new AdjList(this.G);
+
+        this.bufferedReader = new BufferedReader(new FileReader(filename));
+        while ((this.lineText = this.bufferedReader.readLine()) != null) {
+            this.splitLine = this.lineText.split(sp);
+
+            this.node1 = Integer.parseInt(this.splitLine[0]) - start;
+            this.node2 = Integer.parseInt(this.splitLine[1]) - start;
+            if (this.node1 != this.node2) {
+                this.lineWeight = (this.splitLine.length > 2) ? Double.parseDouble(this.splitLine[2]) : 1;
+
+                adjList.CreateGraph(this.node1, this.node2, this.lineWeight);
             }
         }
-        bufferedReader.close();
+        this.bufferedReader.close();
         return adjList.getGraph();
     }
 
-    public static Louvain readMessFile(String filename, String sp) throws IOException{
-
-        BufferedReader bufferedReader;
-        String[] splitLine;
-        HashMap<String, Integer> st;
-        int nNodes, nEdges;
+    private void initGraphHashMap(String filename, String sp) throws IOException {
         String node1, node2;
-        int[] cluster;
-        double[][] weightsEdge;
-        double lineWeight;
-        ArrayList<Integer>[] adj;
-        double[] weightsNode, weightsCluster;
-        String lineText;
-        Louvain network;
 
-        /*
-         *获取文件的行数，即边数
-         */
-        st = new HashMap<String, Integer>();
-        bufferedReader = new BufferedReader(new FileReader(filename));
-        nEdges = 0;
-        while ((lineText = bufferedReader.readLine()) != null) {
-            splitLine = lineText.split(sp);
-            node1 = splitLine[0];
-            if (!st.containsKey(node1)){
-                st.put(node1, st.size());
+        this.st = new HashMap<>();
+        this.bufferedReader = new BufferedReader(new FileReader(filename));
+        this.nEdges = 0;
+        while ((this.lineText = this.bufferedReader.readLine()) != null) {
+            this.splitLine = this.lineText.split(sp);
+            node1 = this.splitLine[0];
+            if (!this.st.containsKey(node1)){
+                this.st.put(node1, this.st.size());
             }
-            node2 = splitLine[1];
-            if (!st.containsKey(node2)){
-                st.put(node2, st.size());
+            node2 = this.splitLine[1];
+            if (!this.st.containsKey(node2)){
+                this.st.put(node2, this.st.size());
             }
+            if (node1 != node2)
+                this.nEdges++;
         }
-        nNodes = st.size();
-        bufferedReader.close();
+        this.bufferedReader.close();
 
-        String[] keys = new String[st.size()];
-        for (String node: st.keySet()) {
-            keys[st.get(node)] = node;
-        }
-        /*
-         *构建网络
-         */
-        weightsEdge = new double[nNodes][nNodes];
-        adj = (ArrayList<Integer>[]) new ArrayList[nNodes];
-
-
-        weightsNode = new double[nNodes];
-        bufferedReader = new BufferedReader(new FileReader(filename));
-        while ((lineText = bufferedReader.readLine()) != null){
-            splitLine = lineText.split(sp);
-            node1 = splitLine[0];
-            int v = st.get(node1);
-
-            node2 = splitLine[1];
-            int w = st.get(node2);
-
-            lineWeight = (splitLine.length > 2) ? Double.parseDouble(splitLine[2]) : 1;
-
-            if (v == w) {
-                continue;
-            }
-
-            weightsNode[v] += lineWeight;
-            weightsNode[w] += lineWeight;
-            weightsEdge[v][w] += lineWeight;
-            weightsEdge[w][v] += lineWeight;
-            if (adj[v] == null)
-                adj[v] = new ArrayList<>();
-            if (adj[w] == null)
-                adj[w] = new ArrayList<>();
-            if (!adj[v].contains(w) && (lineWeight > 0.05)) {
-                adj[v].add(w);
-                adj[w].add(v);
-                nEdges++;
-            }
-
-        }
-        bufferedReader.close();
-        //每个节点的邻居个数
-
-        //
-
-
-        network = new Louvain(nNodes, weightsNode, weightsEdge, adj, nEdges, keys);
-
-        return network;
+        this.nNodes = st.size();
+        this.G = new Louvain(this.nNodes, this.nEdges);
     }
-    public static Louvain readComMat(double[][] conMat) {
-        Louvain network;
-        int nNodes, nEdges;
-        double[] weightsNode;
-        double[][] weightsEdge;
-        ArrayList<Integer>[] adj;
 
-        nNodes = conMat.length;
-        nEdges = 0;
-        weightsNode = new double[nNodes];
-        adj = (ArrayList<Integer>[]) new ArrayList[nNodes];
-        weightsEdge = conMat;
-        for (int i = 0; i < nNodes; i++){
-            adj[i] = new ArrayList<>();
-            for (int j = 0; j < nNodes; j++) {
-                if (conMat[i][j] != 0){
-                    adj[i].add(j);
-                    nEdges++;
-                    weightsNode[i] += conMat[i][j];
+    public Louvain readMessFile(String filename, String sp) throws IOException{
+        String node1, node2;
+        AdjList adjList;
+
+        initGraphHashMap(filename, sp);
+        adjList = new AdjList(this.G);
+
+        this.bufferedReader = new BufferedReader(new FileReader(filename));
+        while ((this.lineText = this.bufferedReader.readLine()) != null){
+            this.splitLine = this.lineText.split(sp);
+            node1 = this.splitLine[0];
+            int v = this.st.get(node1);
+
+            node2 = this.splitLine[1];
+            int w = this.st.get(node2);
+
+            if (v != w) {
+                this.lineWeight = (this.splitLine.length > 2) ? Double.parseDouble(this.splitLine[2]) : 1;
+                adjList.CreateGraph(v, w, this.lineWeight);
+            }
+        }
+        this.bufferedReader.close();
+
+        return adjList.getGraph();
+    }
+
+    public Louvain readMat(double[][] mat) {
+        AdjList adjList;
+
+        this.nNodes = mat.length;
+        this.nEdges = 0;
+        this.G = new Louvain(this.nNodes, this.nEdges);
+
+        adjList = new AdjList(this.G);
+        for (int i = 0; i < this.nNodes; i++){
+            for (int j = i+1; j < this.nNodes; j++) {
+                double w = mat[i][j];
+                if (w != 0){
+                    this.nEdges++;
+                    adjList.CreateGraph(i, j, w);
                 }
             }
         }
-        network = new Louvain(nNodes, weightsNode, weightsEdge, adj, nEdges);
-        return network;
 
+        return adjList.getGraph();
     }
+
     public static void writeFile(String filename, int[] cluster, String[] keys, int start) throws IOException{
         BufferedWriter bufferedWriter;
         int i;
@@ -191,6 +156,7 @@ public class ReadInput {
 
         bufferedWriter.close();
     }
+
     public static void writeFile(String filename, double[][] weightsEdge, int start) throws IOException{
         BufferedWriter bufferedWriter;
         int i, j;

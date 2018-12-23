@@ -34,6 +34,28 @@ public class Louvain {
         this.weightsEdge = new double[this.nNodes][this.nNodes];
         this.adj = (ArrayList<Integer>[]) new ArrayList[this.nNodes];
     }
+
+    public void threshold() {
+        double t = 0.9480597664365985;
+        double max_weight = 0.0;
+        int max_index = -1;
+
+        for (int i = 0; i < this.nNodes; i++) {
+            for (int j: this.adj[i]) {
+                if (this.weightsEdge[i][j] > max_weight) {
+                    max_weight = this.weightsEdge[i][j];
+                    max_index = j;
+                }
+                if ((this.weightsEdge[i][j] < t)) {
+                    this.weightsEdge[i][j] = this.weightsEdge[j][i] =  0.0;
+                }
+
+            }
+            if ((max_weight < t)) {
+                this.weightsEdge[i][max_index] = this.weightsEdge[max_index][i] = max_weight;
+            }
+        }
+    }
     public Louvain(int nNodes, double[] weightsNode, double[][] weightsEdge, ArrayList<Integer>[] adj, int nEdges) {
         this.nNodes = nNodes;
         this.weightsEdge = weightsEdge;
@@ -394,12 +416,15 @@ public class Louvain {
     public static void main(String[] args) throws IOException{
         double resolution;
         Random random;
-        String file = "E:\\Code\\jupyterpy\\tensorflow\\stock\\";
+        String file = "E:\\Code\\jupyterpy\\tensorflow\\stock\\VGG16ConvolutionalAutoEncoder\\";
         random = new Random(100);
         String filename = "net.edgelist";
         String filepath = file + filename + "";
         String fileout = file + filename + "_out.txt";
-        Louvain testNet = ReadInput.readMessFile(filepath, " ");
+
+        ReadInput readInput = new ReadInput();
+        Louvain testNet = readInput.readFile(filepath, " ", 0);
+        testNet.threshold();
         resolution = testNet.getTotalEdgeWeights();
 
         Date start = new Date();

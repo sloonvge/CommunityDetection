@@ -44,7 +44,7 @@ public class ConsensusCluster {
                 }
             }
         }
-        t = 0.5;
+        t = 0.9997;
         max_weight = 0.0;
         max_index = -1;
         for (int i = start; i < nNodes; i++) {
