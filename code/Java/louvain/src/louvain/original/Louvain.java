@@ -170,7 +170,6 @@ public class Louvain {
             weightsCluster[cluster[i]] += weightsNode[i];
             nNodesOfCluster[cluster[i]]++;
         }
-
         nCastClusters = 0;
         castClusters = new int[nNodes];
         for (i = 0; i < nNodes; i++){
@@ -366,9 +365,7 @@ public class Louvain {
 
         if ((cluster == null) || (nNodes == 1))
             return false;
-
         update = moveNode(resolution, random);
-
         if (nClusters < nNodes) {
             re = getRebuildGraph();
             re.initNetwork();
@@ -412,31 +409,6 @@ public class Louvain {
         deleteClusterStats();
         return update;
 
-    }
-    public static void main(String[] args) throws IOException{
-        double resolution;
-        Random random;
-        String file = "E:\\Code\\jupyterpy\\tensorflow\\stock\\VGG16ConvolutionalAutoEncoder\\";
-        random = new Random(100);
-        String filename = "net.edgelist";
-        String filepath = file + filename + "";
-        String fileout = file + filename + "_out.txt";
-
-        ReadInput readInput = new ReadInput();
-        Louvain testNet = readInput.readFile(filepath, " ", 0);
-        testNet.threshold();
-        resolution = testNet.getTotalEdgeWeights();
-
-        Date start = new Date();
-        testNet.initNetwork();
-        testNet.runLouvain(resolution, random);
-        Date end = new Date();
-
-        System.out.printf("Cost: %d\n", end.getTime() - start.getTime());
-        System.out.printf("Nodes: %d, Edges: %d\n", testNet.getNNodes(), testNet.getNEdges());
-        System.out.println(testNet.getNClusters());
-        System.out.println(testNet.calcQuality(resolution));
-        ReadInput.writeFile(fileout, testNet.getCluster(), testNet.getKeys(), 0);
     }
 }
 
