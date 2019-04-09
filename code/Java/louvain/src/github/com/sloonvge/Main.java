@@ -1,6 +1,6 @@
 package github.com.sloonvge;
 
-import graph.io.ReadInput;
+import graph.io.ReadInputLouvain;
 import louvain.original.Louvain;
 
 import java.io.IOException;
@@ -12,16 +12,18 @@ public class Main {
     public static void main(String[] args) throws IOException {
 	// write your code here
         double resolution;
-        ReadInput readInput = new ReadInput();
+        ReadInputLouvain readInput = new ReadInputLouvain();
         Random random;
+
         String file = "D:\\Code\\CommunityDetection\\data\\";
-        random = new Random(100);
         String filename = "club.txt";
         String filepath = file + filename + "";
         String fileout = file + filename + "_out.txt";
         Louvain testNet = readInput.readFile(filepath, " ", 0);
 
+        random = new Random(100);
         resolution = testNet.getTotalEdgeWeights();
+
         Date start = new Date();
         testNet.initNetwork();
         testNet.runLouvain(resolution, random);
@@ -31,6 +33,6 @@ public class Main {
         System.out.printf("Nodes: %d, Edges: %d\n", testNet.getNNodes(), testNet.getNEdges());
         System.out.println(testNet.getNClusters());
         System.out.println(testNet.calcQuality(resolution));
-        ReadInput.writeFile(fileout, testNet.getCluster(), testNet.getKeys(), 0);
+        ReadInputLouvain.writeFile(fileout, testNet.getCluster(), testNet.getKeys(), 0);
     }
 }

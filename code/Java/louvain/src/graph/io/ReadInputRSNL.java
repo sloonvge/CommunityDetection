@@ -5,12 +5,13 @@ package graph.io;
  */
 
 import louvain.original.Louvain;
+import louvain.rsnl.RSNL;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ReadInput {
+public class ReadInputRSNL {
     private BufferedReader bufferedReader;
     private double lineWeight;
     private int node1, node2;
@@ -18,8 +19,10 @@ public class ReadInput {
     private String lineText;
 
     private int nNodes, nEdges;
-    private Louvain G;
+    private RSNL G;
     private HashMap<String, Integer> st;
+
+    public ReadInputRSNL() {}
 
     private void initGraph(String filename, String sp, int start) throws IOException {
         this.bufferedReader = new BufferedReader(new FileReader(filename));
@@ -39,15 +42,15 @@ public class ReadInput {
         this.nNodes += (start == 0) ? 1 : 0;
         this.bufferedReader.close();
 
-        this.G = new Louvain(this.nNodes, this.nEdges);
+        this.G = new RSNL(this.nNodes, this.nEdges);
     }
 
-    public Louvain readFile(String filename, String sp, int start) throws IOException {
-        AdjList adjList;
+    public RSNL readFile (String filename, String sp, int start) throws IOException {
+        AdjListRSNL adjList;
 
         initGraph(filename, sp, start);
 
-        adjList = new AdjList(this.G);
+        adjList = new AdjListRSNL(this.G);
 
         this.bufferedReader = new BufferedReader(new FileReader(filename));
         while ((this.lineText = this.bufferedReader.readLine()) != null) {
@@ -87,15 +90,15 @@ public class ReadInput {
         this.bufferedReader.close();
 
         this.nNodes = st.size();
-        this.G = new Louvain(this.nNodes, this.nEdges);
+        this.G = new RSNL(this.nNodes, this.nEdges);
     }
 
-    public Louvain readMessFile(String filename, String sp) throws IOException{
+    public RSNL readMessFile(String filename, String sp) throws IOException{
         String node1, node2;
-        AdjList adjList;
+        AdjListRSNL adjList;
 
         initGraphHashMap(filename, sp);
-        adjList = new AdjList(this.G);
+        adjList = new AdjListRSNL(this.G);
 
         this.bufferedReader = new BufferedReader(new FileReader(filename));
         while ((this.lineText = this.bufferedReader.readLine()) != null){
@@ -116,14 +119,14 @@ public class ReadInput {
         return adjList.getGraph();
     }
 
-    public Louvain readMat(double[][] mat) {
-        AdjList adjList;
+    public RSNL readMat(double[][] mat) {
+        AdjListRSNL adjList;
 
         this.nNodes = mat.length;
         this.nEdges = 0;
-        this.G = new Louvain(this.nNodes, this.nEdges);
+        this.G = new RSNL(this.nNodes, this.nEdges);
 
-        adjList = new AdjList(this.G);
+        adjList = new AdjListRSNL(this.G);
         for (int i = 0; i < this.nNodes; i++){
             for (int j = i+1; j < this.nNodes; j++) {
                 double w = mat[i][j];

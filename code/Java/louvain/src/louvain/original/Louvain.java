@@ -9,23 +9,23 @@ import java.util.Date;
 import java.util.Random;
 import java.util.ArrayList;
 
-import graph.io.ReadInput;
+import graph.io.ReadInputLouvain;
 
 public class Louvain {
-    private int nNodes, nEdges, nClusters;
-    private double[][] weightsEdge;
-    private ArrayList<Integer>[] adj;
-    private int[] cluster;
-    private double totalEdgeWeights;
-    private double[] weightsNode, weightsCluster;
-    private boolean initStatus;
-    private int[] nNodesPerCluster;
+    public int nNodes, nEdges, nClusters;
+    public double[][] weightsEdge;
+    public ArrayList<Integer>[] adj;
+    public int[] cluster;
+    public double totalEdgeWeights;
+    public double[] weightsNode, weightsCluster;
+    public boolean initStatus;
+    public int[] nNodesPerCluster;
     int[][] nodesPerCluster;
-    private boolean clusterStats;
-    private String[] keys;
-    private Louvain() {}
+    public boolean clusterStats;
+    public String[] keys;
+    public Louvain() {}
 
-    private int ii = 0;
+    public int ii = 0;
 
     public Louvain(int nNodes, int nEdges) {
         this.nNodes = nNodes;
@@ -264,7 +264,7 @@ public class Louvain {
         return update;
     }
 
-    private void deleteClusterStats() {
+    public void deleteClusterStats() {
         weightsCluster = null;
         nNodesPerCluster = null;
         nodesPerCluster = null;
@@ -416,13 +416,13 @@ public class Louvain {
     public static void main(String[] args) throws IOException{
         double resolution;
         Random random;
-        String file = "E:\\Code\\jupyterpy\\tensorflow\\stock\\VGG16ConvolutionalAutoEncoder\\";
+        String file = "D:\\Code\\CommunityDetection\\data\\";
         random = new Random(100);
-        String filename = "net.edgelist";
+        String filename = "football.txt";
         String filepath = file + filename + "";
         String fileout = file + filename + "_out.txt";
 
-        ReadInput readInput = new ReadInput();
+        ReadInputLouvain readInput = new ReadInputLouvain();
         Louvain testNet = readInput.readFile(filepath, " ", 0);
         testNet.threshold();
         resolution = testNet.getTotalEdgeWeights();
@@ -436,7 +436,7 @@ public class Louvain {
         System.out.printf("Nodes: %d, Edges: %d\n", testNet.getNNodes(), testNet.getNEdges());
         System.out.println(testNet.getNClusters());
         System.out.println(testNet.calcQuality(resolution));
-        ReadInput.writeFile(fileout, testNet.getCluster(), testNet.getKeys(), 0);
+        ReadInputLouvain.writeFile(fileout, testNet.getCluster(), testNet.getKeys(), 0);
     }
 }
 
