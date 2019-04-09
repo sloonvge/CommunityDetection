@@ -170,7 +170,6 @@ public class Louvain {
             weightsCluster[cluster[i]] += weightsNode[i];
             nNodesOfCluster[cluster[i]]++;
         }
-
         nCastClusters = 0;
         castClusters = new int[nNodes];
         for (i = 0; i < nNodes; i++){
@@ -366,9 +365,7 @@ public class Louvain {
 
         if ((cluster == null) || (nNodes == 1))
             return false;
-
         update = moveNode(resolution, random);
-
         if (nClusters < nNodes) {
             re = getRebuildGraph();
             re.initNetwork();
@@ -413,6 +410,7 @@ public class Louvain {
         return update;
 
     }
+
     public static void main(String[] args) throws IOException{
         double resolution;
         Random random;
@@ -438,5 +436,6 @@ public class Louvain {
         System.out.println(testNet.calcQuality(resolution));
         ReadInputLouvain.writeFile(fileout, testNet.getCluster(), testNet.getKeys(), 0);
     }
+
 }
 

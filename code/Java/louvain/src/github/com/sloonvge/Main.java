@@ -11,6 +11,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 	// write your code here
+
         double resolution;
         ReadInputLouvain readInput = new ReadInputLouvain();
         Random random;
@@ -34,5 +35,6 @@ public class Main {
         System.out.println(testNet.getNClusters());
         System.out.println(testNet.calcQuality(resolution));
         ReadInputLouvain.writeFile(fileout, testNet.getCluster(), testNet.getKeys(), 0);
+
     }
 }
